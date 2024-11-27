@@ -22,15 +22,17 @@ def setup_logger(exp_name,version=None):
 
 def get_trainer(args, version=None, precision=32, fast_dev_run=False):
     if args.no_cuda:
-        args.gpus = 0
+        accelerator = 'cpu'
         logger.info(f'[Trainer] CUDA disable by no_cuda flag')
     else:
-        args.gpus = get_num_gpus()
-        logger.info(f'[Trainer] number of GPU found {args.gpus}')
+        accelerator = 'auto'
+        logger.info(f'[Trainer] number of GPU found {get_num_gpus()}')
+
     pb_cb = TQDMProgressBar(refresh_rate=1)
     
     trainer = pl.Trainer(
-        gpus=args.gpus,
+        accelerator=accelerator,
+        devices='auto',
         fast_dev_run=fast_dev_run,
         precision=precision,
         max_epochs=args.epochs,

@@ -1,5 +1,4 @@
 import logging
-from typing import Any, List
 
 import pandas as pd
 import pytorch_lightning as pl
@@ -8,7 +7,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from torchmetrics import Accuracy, ConfusionMatrix, F1Score, MeanMetric
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup
+from torch.optim.adamw import AdamW
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +35,13 @@ class BaseModule(pl.LightningModule):
         self.all_metrics = nn.ModuleDict()
         for phase in ['train','val', 'test']:
             self.all_metrics[phase+'_metrics'] = nn.ModuleDict({
-                    "acc": Accuracy(),
-                    "accmacro": Accuracy(num_classes=nclass,average='macro'),
+                    "acc": Accuracy(task='multiclass', num_classes=nclass),
+                    "accmacro": Accuracy(task='multiclass',num_classes=nclass,average='macro'),
                     "loss": MeanMetric(),
-                    "f1macro": F1Score(num_classes=nclass,average='macro'),
-                    "f1micro": F1Score(num_classes=nclass,average='micro'),
-                    "f1none": F1Score(num_classes=nclass,average='none'),
-                    "confmx": ConfusionMatrix(nclass)
+                    "f1macro": F1Score(task='multiclass',num_classes=nclass,average='macro'),
+                    "f1micro": F1Score(task='multiclass',num_classes=nclass,average='micro'),
+                    "f1none": F1Score(task='multiclass',num_classes=nclass,average='none'),
+                    "confmx": ConfusionMatrix(task='multiclass', num_classes=nclass)
                 })
 
     def forward(self, x):
@@ -154,7 +154,7 @@ class BaseModule(pl.LightningModule):
         outputs = self.shared_my_step(batch, batch_nb, phase)
         return outputs
 
-    def training_epoch_end(self, outputs) -> None:
+    def on_train_epoch_end(self) -> None:
         phase = 'train'
         self.metrics_end(phase)
 
@@ -163,7 +163,7 @@ class BaseModule(pl.LightningModule):
         outputs = self.shared_my_step(batch, batch_nb, phase)
         return outputs
 
-    def validation_epoch_end(self, outputs: List[Any]) -> None:
+    def on_validation_epoch_end(self) -> None:
         phase = 'val'
         self.metrics_end(phase)
 
@@ -184,7 +184,7 @@ class BaseModule(pl.LightningModule):
         
         return 
 
-    def test_epoch_end(self, outputs: List[Any]) -> None:
+    def on_test_epoch_end(self) -> None:
         phase = 'test'
         self.metrics_end(phase)
     
