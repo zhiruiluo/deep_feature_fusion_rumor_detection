@@ -14,7 +14,10 @@ The increasing popularity of social media has made the creation and spread of ru
 #### Please consider starring us, if you found it useful. Thanks
 
 ## Requirements
-Code has been tested in Python 3.8 and supports CUDA compatiable GPU devices via PyTorch. The packages needed to run the code are listed in requirements.txt.
+Code has been tested in Python 3.11 and supports CUDA compatiable GPU devices via PyTorch. The packages needed to run the code are listed in requirements.txt.
+```bash
+pip install -r requirements.txt
+```
 
 ## Run Demo
 ```bash
@@ -22,8 +25,10 @@ $ python src/run/main.py --model=RoBERTa_CNN --dataset=twitter15 --epochs=200
 ```
 
 ## Dataset
-The raw dataset, Twitter15 and Twitter16, can be downloaded from https://www.dropbox.com/s/7ewzdrbelpmrnxu/rumdetect2017.zip?dl=0.
-
+The raw dataset, Twitter15 and Twitter16, can be downloaded from https://www.dropbox.com/s/7ewzdrbelpmrnxu/rumdetect2017.zip?dl=0. To specify the dataset root folder:
+```bash
+$ python src/run/main.py --model=RoBERTa_CNN --dataset=twitter15 --epochs=200 --dataset_root=rumor_detection_acl2017/
+```
 
 ## Citation
 
